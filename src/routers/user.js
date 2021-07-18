@@ -33,7 +33,7 @@ router.get('/forgot/:mail', async (req, res) => {
             throw new Error('No user found')
         }
         forgotPassword(req.params.mail)
-        res.status(200).send('Forgot Password mail sent to your mail id')
+        res.status(200).send(`Forgot Password mail sent to your mail id - ${req.params.mail}`)
     }
     catch (e) {
         res.status(400).send()
