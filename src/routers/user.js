@@ -3,7 +3,7 @@ const User = require('../models/users')
 const router = new express.Router()
 const bcrypt = require('bcryptjs')
 const { forgotPassword } = require('../email/account')
-
+const auth = require('../middleware/auth')
 
 router.post('/signup', async (req, res) => {
     const user = new User(req.body)
@@ -24,6 +24,10 @@ router.post('/users/login', async (req, res) => {
     } catch (e) {
         res.status(400).send()
     }
+})
+
+router.get('/users/me', auth, async (req, res) => {
+    res.send(req.user)
 })
 
 router.get('/forgot/:mail', async (req, res) => {
@@ -55,7 +59,16 @@ router.patch('/forgot/:mail/newPassword', async (req, res) => {
     }
 })
 
-
+router.post('/users/logout', auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => {
+            return token.token !== req.token
+        })
+        await req.user.save()
+        res.send()
+    } catch (e) {
+        res.status(500).send()
+    }
+})
 
 module.exports = router
-
